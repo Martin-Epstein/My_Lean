@@ -298,6 +298,17 @@ m.lt n ↔ m.le n ∧ m ≠ n := by
   case succ c =>
     use c
 
+theorem ne_of_lt (m n : MyNat) (h : m.lt n) : m ≠ n := by
+  rw [lt_iff_le_and_ne] at h
+  exact h.2
+
+theorem ne_zero_of_lt (m n : MyNat) (h : m.lt n) :
+n ≠ zero := by
+  rw [lt_iff_not_ge] at h
+  contrapose! h
+  rw [ge, h]
+  exact zero_le
+
 theorem zero_lt_succ {n : MyNat} : zero.lt n.succ := by
   use n
   rw [zero_add]
@@ -330,6 +341,18 @@ a.sub b = zero ↔ a.le b := by
   intro eq1
   rcases eq1 with ⟨c, eq1⟩
   rw [eq1, ← sub_sub_eq_sub_add, sub_self, zero_sub]
+
+theorem self_sub_le_self (m n : MyNat) :
+(m.sub n).le m := by
+  rcases le_or_gt (m := m) (n := n) with h | h
+  · rw [← sub_eq_zero_iff_le] at h
+    rw [h]
+    exact zero_le
+  rw [gt] at h
+  rcases h with ⟨c, h⟩
+  rw [h, add_sub_cancel_left]
+  use n
+  rw [add_comm]
 
 theorem succ_sub {a b : MyNat} :
 a.le b ↔ b.succ.sub a = (b.sub a).succ := by

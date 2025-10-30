@@ -1,4 +1,4 @@
-import MyLean.MyNat.p9_Division
+import MyLean.MyNat.p8_Powers
 
 namespace MyNat
 
@@ -70,5 +70,30 @@ satisfiable P ↔ ∃ m, min P m := by
   intro h
   rcases h with ⟨m, ⟨h1, _⟩⟩
   use m
+
+theorem lt_min (P : MyNat → Prop) (m k : MyNat)
+(km : k.lt m) (hm : min P m) : ¬ P k := by
+  rw [lt_iff_not_ge, ge] at km
+  rw [min] at hm
+  rcases hm with ⟨h1, h2⟩
+  specialize h2 k
+  tauto
+
+theorem strong_induction (P : MyNat → Prop) :
+(∀ m : MyNat, (∀ k : MyNat, k.lt m → P k) → P m) →
+∀ m : MyNat, P m := by
+  by_contra h
+  push_neg at h
+  rcases h with ⟨h1, h2⟩
+  rw [← satisfiable, well_order] at h2
+  rcases h2 with ⟨m, h2⟩
+  specialize h1 m
+  have : ∀ (k : MyNat), k.lt m → P k := by
+    intro k hk
+    have := lt_min (P := fun x => ¬P x)
+      (m := m) (k := k) (km := hk) (hm := h2)
+    exact not_not.1 this
+  apply h1 at this
+  exact h2.1 this
 
 end MyNat

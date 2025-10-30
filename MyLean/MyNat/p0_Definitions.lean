@@ -29,6 +29,17 @@ protected def toString [ToString Nat] (t : MyNat) : String :=
 instance [ToString Nat] : ToString MyNat where
   toString := MyNat.toString
 
+def DecEqAux : (m n : MyNat) → Decidable (m = n)
+  | zero, zero       => isTrue rfl
+  | zero, succ _     => isFalse (by nofun)
+  | succ _, zero     => isFalse (by nofun)
+  | succ m, succ n   =>
+    match DecEqAux m n with
+    | isTrue h  => isTrue (congrArg succ h)
+    | isFalse h => isFalse (by contrapose! h; exact succ.inj h)
+
+instance : DecidableEq MyNat := DecEqAux
+
 def one : MyNat := succ zero
 
 def two : MyNat := succ one
@@ -64,7 +75,10 @@ def pred : MyNat → MyNat
   | succ x => x
 
 def sub : MyNat → MyNat → MyNat
-  | m, n => iterate pred n m
+| zero, _         => zero
+| succ m, n => match n with
+               | zero => succ m
+               | succ n' => sub m n'
 
 def le (x y : MyNat) : Prop := ∃ z, y = x.add z
 

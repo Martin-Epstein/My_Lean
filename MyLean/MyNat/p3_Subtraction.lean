@@ -22,25 +22,31 @@ a.pred = zero ↔ a = zero ∨ a = one := by
   · rw [h, pred]
   rw [h, one, pred]
 
+theorem zero_sub (a : MyNat) : zero.sub a = zero := by
+  rw [sub]
+
 theorem sub_zero {a : MyNat} :
 a.sub zero = a := by
-  rw [sub, iterate]
-
-theorem zero_sub {a : MyNat} : zero.sub a = zero := by
-  induction a with
-  | zero =>
-    rw [sub_zero]
-  | succ a ih =>
-    rw [sub, iterate, ← sub, pred]
-    exact ih
+  cases a with
+  | zero => rw [sub]
+  | succ a => rw [sub]
 
 theorem succ_sub_succ {a b : MyNat} :
-a.succ.sub b.succ = a.sub b := by
-  rw [sub, iterate, ← sub, pred]
+a.succ.sub b.succ = a.sub b := by rw [sub]
 
-theorem sub_succ {a b : MyNat} :
+theorem sub_succ (a b : MyNat) :
 a.sub b.succ = (a.sub b).pred := by
-  rw [sub, iterate_out, ← sub]
+  induction a generalizing b with
+  | zero =>
+    rw [zero_sub, zero_sub, pred]
+  | succ a ih =>
+    rw [succ_sub_succ]
+    cases b with
+    | zero =>
+      rw [sub_zero, sub_zero, pred]
+    | succ b =>
+      rw [succ_sub_succ]
+      exact ih b
 
 theorem sub_self {a : MyNat} :
 a.sub a = zero := by

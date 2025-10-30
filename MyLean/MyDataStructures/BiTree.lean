@@ -1,4 +1,4 @@
-import MyLean.Queue
+import MyLean.MyDataStructures.Queue
 import Mathlib.Tactic.Tauto
 import Mathlib.Data.Prod.Basic
 

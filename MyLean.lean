@@ -1,4 +1,4 @@
-import MyLean.Queue
+import MyLean.MyDataStructures.Queue
 import MyLean.MyNat.p0_Definitions
 import MyLean.MyNat.p1_Successor
 import MyLean.MyNat.p2_Addition
@@ -8,5 +8,5 @@ import MyLean.MyNat.p5_Ordering
 import MyLean.MyNat.p6_IncreasingFunctions
 import MyLean.MyNat.p7_Summation
 import MyLean.MyNat.p8_Powers
-import MyLean.MyNat.p9_Division
-import MyLean.MyNat.p10_WellOrder
+import MyLean.MyNat.p9_WellOrder
+import MyLean.MyNat.p10_Division

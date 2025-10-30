@@ -4,6 +4,46 @@ set_option linter.unusedVariables false
 
 namespace MyNat
 
+/-
+We can assume n ≠ zero
+
+-/
+
+def divAux2 : MyNat → MyNat → MyNat → MyNat
+  | acc, zero, n => acc.pred
+  | acc, succ m, n => divAux2 acc.succ (m.sub n) n
+termination_by _ m => m
+
+decreasing_by
+  simp only [succ.sizeOf_spec]
+  apply Nat.lt_of_le_of_lt (m := sizeOf m)
+  · have : ∀ a b : MyNat, sizeOf (b.sub a) ≤ sizeOf b := by
+      intro a
+      induction a with
+      | zero =>
+        intro b; rw [sub_zero]
+        exact Nat.le_refl (n := sizeOf b)
+      | succ a ih =>
+        intro b
+        cases b with
+        | zero =>
+          rw [zero_sub]
+          apply Nat.le_refl
+        | succ b =>
+          rw [succ_sub_succ, succ.sizeOf_spec]
+          specialize ih b
+          trans sizeOf b
+          · exact ih
+          apply Nat.le_add_left
+    exact this n m
+  rw [Nat.add_comm]
+  apply Nat.lt_add_one
+
+def div2 : MyNat → MyNat → MyNat
+  | _, zero => zero
+  | m, succ zero => m
+  | m, succ (succ n) => divAux2 zero m.succ n.succ
+
 def divAux : MyNat → MyNat → MyNat → MyNat
   | acc, m, n =>
     if nz : n = zero then

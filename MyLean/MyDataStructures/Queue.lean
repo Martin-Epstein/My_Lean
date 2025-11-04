@@ -1,58 +1,39 @@
+import MyLean.MyDataStructures.Stack
 import Mathlib.Tactic.TypeStar
 import Mathlib.Data.Nat.Notation
 
-inductive Queue (α : Type*) where
-  | empty : Queue α
-  | mk : α → List α → List α → Queue α
+structure Queue (α : Type*) where
+  front : Stack α
+  back : Stack α
 
 namespace Queue
 
 protected def toString {α : Type*} [ToString α] (t : Queue α) : String :=
-  match t with
-  | empty => "queue [] []"
-  | mk a front back => "queue " ++ toString (a :: front) ++ " " ++ toString back
+  "[ " ++ toString t.front ++ "] [ " ++ toString t.back ++ "]"
 
 instance {α : Type*} [ToString α] : ToString (Queue α) where
   toString := Queue.toString
 
-def enqueue {α : Type*} : Queue α → α → Queue α
-  | empty, a              => mk a [] []
-  | mk head front back, a => mk head front (a :: back)
+def enqueue {α : Type*} (a : α) (q : Queue α) : Queue α where
+  front := q.front
+  back  := Stack.push a q.back
 
-def last {α : Type*} : α → List α → α
-  | a, [] => a
-  | _, (b :: bs) => last b bs
+def dequeue {α : Type*} (q : Queue α) : ((Option α) × Queue α) :=
+  match q.front with
+  | Stack.push a as =>
+    (some a, {front := as
+            , back  := q.back})
+  | Stack.empty =>
+    match Stack.rev_tr q.back with
+    | Stack.push b bs =>
+      (some b, {front := bs
+              , back  := Stack.empty})
+    | Stack.empty =>
+      (none, {front := Stack.empty
+            , back  := Stack.empty})
 
-def dequeue {α : Type*} : Queue α → Option (α × Queue α)
-  | empty             => none
-  | mk a [] [] => some (a, empty)
-  | mk a (b :: bs) back => some (a, mk b bs back)
-  | mk a [] (b :: bs) =>
-      let rev := (b :: bs).reverse
-      match rev with
-      | [] => none
-      | c :: cs => some (a, mk c cs [])
+def empty {α : Type*} : Queue α where
+  front := Stack.empty
+  back  := Stack.empty
 
 end Queue
-
-open Queue
-
-#eval (Queue.empty : Queue Nat)
-
-def blah {α : Type*} : Option (α × Queue α) → Option (α × Queue α)
-  | none => none
-  | some (_, aq) => dequeue aq
-
-def q0 := mk 2 [3, 5, 6] [3, 2, 1]
-def q1 := dequeue q0
-def q2 := blah q1
-def q3 := blah q2
-def q4 := blah q3
-def q5 := blah q4
-
-#eval q0
-#eval q1
-#eval q2
-#eval q3
-#eval q4
-#eval q5

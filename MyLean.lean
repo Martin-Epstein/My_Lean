@@ -1,4 +1,6 @@
+import MyLean.MyDataStructures.Stack
 import MyLean.MyDataStructures.Queue
+
 import MyLean.MyNat.p0_Definitions
 import MyLean.MyNat.p1_Successor
 import MyLean.MyNat.p2_Addition
